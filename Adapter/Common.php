@@ -201,6 +201,8 @@ abstract class Common extends Adapter
 
         if ($source instanceof \Gregwar\Image\Source\File) {
             $this->loadFile($source->getFile(), $source->guessType());
+        } else if ($source instanceof \Gregwar\Image\Source\S3File) {
+            $this->loadFile($source->getFile(), $source->guessType());            
         } else if ($source instanceof \Gregwar\Image\Source\Create) {
             $this->createImage($source->getWidth(), $source->getHeight());
         } else if ($source instanceof \Gregwar\Image\Source\Data) {

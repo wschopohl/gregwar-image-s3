@@ -172,7 +172,7 @@ class Image
      */
     protected $operations = array();
 
-    public function __construct($originalFile = null, $width = null, $height = null)
+    public function __construct($originalFile = null, $s3, $width = null, $height = null)
     {
         $this->cache = new \Gregwar\Cache\Cache;
         $this->cache->setCacheDirectory($this->cacheDir);
@@ -180,7 +180,8 @@ class Image
         $this->setFallback(null);
 
         if ($originalFile) {
-            $this->source = new Source\File($originalFile);
+            if($s3) $this->source = new Source\S3File($originalFile);
+            else $this->source = new Source\File($originalFile);
         } else {
             $this->source = new Source\Create($width, $height);
         }
@@ -297,9 +298,11 @@ class Image
     {
         if ($this->source instanceof Source\File) {
             return $this->source->getFile();
-        } else {
-            return null;
+        } 
+        if($this->source instanceof Source\S3File) {
+            return $this->source->getFile();
         }
+        return null;
     }
 
     /**
@@ -586,7 +589,6 @@ class Image
     {
         if ($file) {
             $directory = dirname($file);
-
             if (!is_dir($directory)) {
                 @mkdir($directory, 0777, true);
             }
@@ -608,7 +610,9 @@ class Image
         $type = self::$types[$type];
 
         try {
+            
             $this->init();
+
             $this->applyOperations();
 
             $success = false;
@@ -702,9 +706,9 @@ class Image
     /**
      * Creates an instance, usefull for one-line chaining
      */
-    public static function open($file = '')
+    public static function open($file = '', $s3 = false)
     {
-        return new static($file);
+        return new static($file, $s3);
     }
 
     /**
@@ -712,7 +716,7 @@ class Image
      */
     public static function create($width, $height)
     {
-        return new static(null, $width, $height);
+        return new static(null, null, $width, $height);
     }
 
     /**
