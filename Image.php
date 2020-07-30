@@ -765,10 +765,7 @@ class Image
      */
     public static function open($file = '', $s3 = false)
     {
-        // return new static($file, $s3);
-	$image = new static($file, $s3);
-        $image->setCacheDir(public_path('cache/images'));
-        return $image;
+        return new static($file, $s3);
     }
 
     /**
